@@ -1,4 +1,4 @@
-# sensor.ctabustracker
+# sensor.youtube
 
 [![BuyMeCoffee][buymecoffeebedge]][buymecoffee]
 [![custom_updater][custom_updater_badge]][custom_updater]

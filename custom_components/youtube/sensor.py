@@ -13,7 +13,7 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.helpers.entity import Entity
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 CONF_CHANNEL_ID = 'channel_id'
 
@@ -58,20 +58,25 @@ class YoutubeSensor(Entity):
 
     async def async_update(self):
         """Update sensor."""
+        _LOGGER.debug('%s - Running update', self._name)
         try:
             url = BASE_URL.format(self.channel_id)
             info = requests.get(url).text
             title = html.parser.HTMLParser().unescape(
                 info.split('<title>')[2].split('</')[0])
-            self.url = info.split('<link rel="alternate" href="')[2].split('"/>')[0]
-            self.live = await is_live(self.channel_id)
+            url = info.split('<link rel="alternate" href="')[2].split('"/>')[0]
+            if self.live or url != self.url:
+                self.live = await is_live(self.channel_id, self._name)
+            else:
+                _LOGGER.debug('%s - Skipping live check', self._name)
+            self.url = url
             self.published = info.split('<published>')[2].split('</')[0]
             thumbnail_url = info.split(
                 '<media:thumbnail url="')[1].split('"')[0]
             self._state = title
             self._image = thumbnail_url
-        except:
-            _LOGGER.debug('Could not update')
+        except Exception as error:  # pylint: disable=broad-except
+            _LOGGER.debug('%s - Could not update - %s', self._name, error)
 
     @property
     def name(self):
@@ -101,7 +106,7 @@ class YoutubeSensor(Entity):
                 'live': self.live}
 
 
-async def is_live(channel_id):
+async def is_live(channel_id, name):
     """Return bool if channel is live"""
     returnvalue = False
     url = BASE_URL_LIVE.format(channel_id)
@@ -109,6 +114,7 @@ async def is_live(channel_id):
         info = requests.get(url).text
         if 'live-promo' in info:
             returnvalue = True
-    except:
-        _LOGGER.debug('Channel is not live.')
+            _LOGGER.debug('%s - Channel is live', name)
+    except Exception as error:  # pylint: disable=broad-except
+        _LOGGER.debug('%s - Could not update - %s', name, error)
     return returnvalue

@@ -1,7 +1,6 @@
 # sensor.youtube
 
 [![BuyMeCoffee][buymecoffeebedge]][buymecoffee]
-[![custom_updater](https://img.shields.io/badge/custom__updater-true-success.svg)](https://github.com/custom-components/custom_updater)
 
 _A platform which give you info about the newest video on a channel._
 

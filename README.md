@@ -10,8 +10,8 @@ _A platform which give you info about the newest video on a channel._
 
 ## Installation
 
-To get started put `/custom_components/youtube/sensor.py` here:  
-`<config directory>/custom_components/youtube/sensor.py`
+To get started put all the files from`/custom_components/youtube/` here:  
+`<config directory>/custom_components/youtube/`
 
 ## Example configuration.yaml
 

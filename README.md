@@ -1,4 +1,4 @@
-# sensor.youtube
+# youtube
 
 [![BuyMeCoffee][buymecoffeebedge]][buymecoffee]
 
@@ -10,7 +10,7 @@ _A platform which give you info about the newest video on a channel._
 
 ## Installation
 
-To get started put all the files from`/custom_components/youtube/` here:  
+To get started put all the files from`/custom_components/youtube/` here:
 `<config directory>/custom_components/youtube/`
 
 ## Example configuration.yaml
@@ -22,9 +22,9 @@ sensor:
 ```
 
 ## Configuration variables
-  
-key | type | description  
-:--- | :--- | :---  
+
+key | type | description
+:--- | :--- | :---
 **platform (Required)** | string | The platform name.
 **channel_id (Required)** | string | The Channel ID of the Youtube channel.
 

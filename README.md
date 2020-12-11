@@ -11,6 +11,21 @@ _A platform which give you info about the newest video on a channel._
 To get started put all the files from`/custom_components/youtube/` here:
 `<config directory>/custom_components/youtube/`
 
+### How to get API key
+- Click [here](https://console.developers.google.com/project) to go to the Google Cloud Console
+- Click Create Project in the top menu, enter project name and click Create
+- Wait until the project is created
+- Click on the Google APIs logo at the top left corner
+- Click Library in the left menu, select YouTube Data API V3 under the YouTube section and then click Enable
+- Click Create Credentials at the top right
+- Select YouTube Data API v3 in drop-down list
+- In next drop-down list select Web server (e.g. node.js, Tomcat)
+- Choose Public data
+- Click What credentials do I need
+- Copy your API key
+- Click Done
+- Paste copied key to your configuration
+
 ## Example configuration.yaml
 
 ```yaml

@@ -61,6 +61,7 @@ class YoutubeSensor(Entity):
         self.channel_id = channel_id
         self.api_key = api_key
         self.url = None
+        self.live_url = None
         self.published = None
 
     async def async_update(self):
@@ -80,9 +81,11 @@ class YoutubeSensor(Entity):
                     response = await self.session.get(live_url)
                     live_info = await response.text()
                     live_data = json.loads(live_info)
-                live_data = live_data['items'][0]['snippet']['liveBroadcastContent']
-                if live_data == 'live':
+                live_check = live_data['items'][0]['snippet']['liveBroadcastContent']
+                
+                if live_check == 'live':
                     self.live = True
+                    self.live_url = 'https://www.youtube.com/watch?v=' + live_data['items'][0]['id']['videoId']
                 else:
                     _LOGGER.debug('%s - Skipping live check', self._name)
             except Exception as error:  # pylint: disable=broad-except
@@ -120,4 +123,5 @@ class YoutubeSensor(Entity):
         """Attributes."""
         return {'url': self.url,
                 'published': self.published,
-                'live': self.live}
+                'live': self.live,
+                'live_url': self.live_url}

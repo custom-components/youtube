@@ -74,10 +74,17 @@ class YoutubeSensor(Entity):
             data = json.loads(info)
             title = data['items'][0]['snippet']['title']
             url = 'https://www.youtube.com/watch?v=' + data['items'][0]['id']['videoId']
-            live_info = data['items'][0]['snippet']['liveBroadcastContent']
-            if live_info == 'live':
-                self.live = True
-            else:
+            try:
+                async with async_timeout.timeout(10, loop=self.hass.loop):
+                    response = await self.session.get(url + '&type=video&eventType=live')
+                    live_info = await response.text()
+                    live_data = json.loads(live_info)
+                live_data = data['items'][0]['snippet']['liveBroadcastContent']
+                if live_data == 'live':
+                    self.live = True
+                else:
+                    _LOGGER.debug('%s - Skipping live check', self._name)
+            except Exception as error:  # pylint: disable=broad-except
                 _LOGGER.debug('%s - Skipping live check', self._name)
             self.url = url
             self.published = data['items'][0]['snippet']['publishTime']

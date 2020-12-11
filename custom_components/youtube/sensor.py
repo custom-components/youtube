@@ -68,6 +68,7 @@ class YoutubeSensor(Entity):
         _LOGGER.debug('%s - Running update', self._name)
         try:
             url = BASE_URL.format(self.channel_id, self.api_key)
+            live_url = url + '&type=video&eventType=live'
             async with async_timeout.timeout(10, loop=self.hass.loop):
                 response = await self.session.get(url)
                 info = await response.text()
@@ -76,10 +77,10 @@ class YoutubeSensor(Entity):
             url = 'https://www.youtube.com/watch?v=' + data['items'][0]['id']['videoId']
             try:
                 async with async_timeout.timeout(10, loop=self.hass.loop):
-                    response = await self.session.get(url + '&type=video&eventType=live')
+                    response = await self.session.get(live_url)
                     live_info = await response.text()
                     live_data = json.loads(live_info)
-                live_data = data['items'][0]['snippet']['liveBroadcastContent']
+                live_data = live_data['items'][0]['snippet']['liveBroadcastContent']
                 if live_data == 'live':
                     self.live = True
                 else:

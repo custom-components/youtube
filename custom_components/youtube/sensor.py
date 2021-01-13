@@ -117,9 +117,10 @@ async def is_live(url, name, hass, session):
         async with async_timeout.timeout(10, loop=hass.loop):
             response = await session.get(url)
             info = await response.text()
-        if 'Started streaming' in info:
-            returnvalue = True
-            _LOGGER.debug('%s - Latest Video is live', name)
+        if 'isLiveBroadcast' in info:
+            if 'endDate' not in info:
+                returnvalue = True
+                _LOGGER.debug('%s - Latest Video is live', name)
     except Exception as error:  # pylint: disable=broad-except
         _LOGGER.debug('%s - Could not update - %s', name, error)
     return returnvalue

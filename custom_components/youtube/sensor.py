@@ -19,6 +19,7 @@ CONF_CHANNEL_ID = 'channel_id'
 ICON = 'mdi:youtube'
 
 BASE_URL = 'https://www.youtube.com/feeds/videos.xml?channel_id={}'
+CHANNEL_LIVE_URL = 'https://www.youtube.com/channel/{}/live'
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_CHANNEL_ID): cv.string,
@@ -57,6 +58,7 @@ class YoutubeSensor(Entity):
         self.channel_id = channel_id
         self.url = None
         self.published = None
+        self.channel_live = False
 
     async def async_update(self):
         """Update sensor."""
@@ -79,6 +81,8 @@ class YoutubeSensor(Entity):
                 '<media:thumbnail url="')[1].split('"')[0]
             self._state = title
             self._image = thumbnail_url
+            url = CHANNEL_LIVE_URL.format(self.channel_id)
+            self.channel_live = await is_channel_live(url, self.name, self.hass, self.session)
         except Exception as error:  # pylint: disable=broad-except
             _LOGGER.debug('%s - Could not update - %s', self._name, error)
 
@@ -107,7 +111,8 @@ class YoutubeSensor(Entity):
         """Attributes."""
         return {'url': self.url,
                 'published': self.published,
-                'live': self.live}
+                'live': self.live,
+                'channel_is_live': self.channel_live}
 
 
 async def is_live(url, name, hass, session):
@@ -124,3 +129,17 @@ async def is_live(url, name, hass, session):
     except Exception as error:  # pylint: disable=broad-except
         _LOGGER.debug('%s - Could not update - %s', name, error)
     return returnvalue
+
+async def is_channel_live(url, name, hass, session):
+    """Return bool if channel is live"""
+    live = False
+    try:
+        async with async_timeout.timeout(10, loop=hass.loop):
+            response = await session.get(url)
+            info = await response.text()
+        if '"isLive":true' in info:
+            live = True
+            _LOGGER.debug('%s - Channel is live', name)
+    except Exception as error:  # pylint: disable=broad-except
+        _LOGGER.debug('%s - Could not update - %s', name, error)
+    return live

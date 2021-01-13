@@ -116,7 +116,7 @@ async def is_live(url, name, hass, session):
     """Return bool if video is live"""
     live = False
     stream = False
-        try:
+    try:
         async with async_timeout.timeout(10, loop=hass.loop):
             response = await session.get(url)
             info = await response.text()

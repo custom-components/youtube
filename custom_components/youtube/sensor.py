@@ -113,7 +113,7 @@ class YoutubeSensor(Entity):
 
 
 async def is_live(url, name, hass, session):
-    """Return bool if video is live"""
+    """Return bool if video is stream and bool if video is live"""
     live = False
     stream = False
     try:

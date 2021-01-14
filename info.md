@@ -31,4 +31,4 @@ key | type | description
 * published: The time and date the video was published
 * stream: If the video was streamed live
 * live: If the video is live now
-* channel_live: If any video on the channel is live
+* channel_is_live: If any video on the channel is live

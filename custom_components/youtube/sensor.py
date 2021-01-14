@@ -52,6 +52,7 @@ class YoutubeSensor(Entity):
         self._state = None
         self.session = session
         self._image = None
+        self.stream = False
         self.live = False
         self._name = name
         self.channel_id = channel_id
@@ -70,7 +71,7 @@ class YoutubeSensor(Entity):
                 info.split('<title>')[2].split('</')[0])
             url = info.split('<link rel="alternate" href="')[2].split('"/>')[0]
             if self.live or url != self.url:
-                self.live = await is_live(url, self._name, self.hass, self.session)
+                self.stream, self.live = await is_live(url, self._name, self.hass, self.session)
             else:
                 _LOGGER.debug('%s - Skipping live check', self._name)
             self.url = url
@@ -107,20 +108,23 @@ class YoutubeSensor(Entity):
         """Attributes."""
         return {'url': self.url,
                 'published': self.published,
+                'stream': self.stream,
                 'live': self.live}
 
 
 async def is_live(url, name, hass, session):
-    """Return bool if channel is live"""
-    returnvalue = False
+    """Return bool if video is stream and bool if video is live"""
+    live = False
+    stream = False
     try:
         async with async_timeout.timeout(10, loop=hass.loop):
             response = await session.get(url)
             info = await response.text()
         if 'isLiveBroadcast' in info:
+            stream = True
             if 'endDate' not in info:
-                returnvalue = True
+                live = True
                 _LOGGER.debug('%s - Latest Video is live', name)
     except Exception as error:  # pylint: disable=broad-except
         _LOGGER.debug('%s - Could not update - %s', name, error)
-    return returnvalue
+    return stream, live

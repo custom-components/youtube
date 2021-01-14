@@ -18,3 +18,16 @@ key | type | description
 :--- | :--- | :---  
 **platform (Required)** | string | The platform name.
 **channel_id (Required)** | string | The Channel ID of the Youtube channel.
+
+## State and Attributes
+
+### State
+
+* The name of the most recent video
+
+### Attributes
+
+* url: URL of the most recent video
+* published: The time and date the video was published
+* stream: If the video was streamed live
+* live: If the video is live now

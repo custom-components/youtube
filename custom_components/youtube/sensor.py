@@ -13,13 +13,14 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.helpers.entity import Entity
+import re
 
 CONF_CHANNEL_ID = 'channel_id'
 
 ICON = 'mdi:youtube'
 
 BASE_URL = 'https://www.youtube.com/feeds/videos.xml?channel_id={}'
-CHANNEL_LIVE_URL = 'https://www.youtube.com/channel/{}/live'
+CHANNEL_LIVE_URL = 'https://www.youtube.com/channel/{}'
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_CHANNEL_ID): cv.string,
@@ -60,6 +61,7 @@ class YoutubeSensor(Entity):
         self.url = None
         self.published = None
         self.channel_live = False
+        self.channel_image = None
 
     async def async_update(self):
         """Update sensor."""
@@ -83,7 +85,7 @@ class YoutubeSensor(Entity):
             self._state = title
             self._image = thumbnail_url
             url = CHANNEL_LIVE_URL.format(self.channel_id)
-            self.channel_live = await is_channel_live(url, self.name, self.hass, self.session)
+            self.channel_live, self.channel_image = await is_channel_live(url, self.name, self.hass, self.session)
         except Exception as error:  # pylint: disable=broad-except
             _LOGGER.debug('%s - Could not update - %s', self._name, error)
 
@@ -114,7 +116,8 @@ class YoutubeSensor(Entity):
                 'published': self.published,
                 'stream': self.stream,
                 'live': self.live,
-                'channel_is_live': self.channel_live}
+                'channel_is_live': self.channel_live,
+                'channel_image': self.channel_image}
 
 async def is_live(url, name, hass, session):
     """Return bool if video is stream and bool if video is live"""
@@ -140,9 +143,11 @@ async def is_channel_live(url, name, hass, session):
         async with async_timeout.timeout(10, loop=hass.loop):
             response = await session.get(url)
             info = await response.text()
-        if '"isLive":true' in info:
+        if '{"iconType":"LIVE"}' in info:
             live = True
             _LOGGER.debug('%s - Channel is live', name)
+        regex = r"\"width\":48,\"height\":48},{\"url\":\"(.*?)\",\"width\":88,\"height\":88},{\"url\":"
+        channel_image = re.findall(regex, info, re.MULTILINE)[0].replace("=s88-c-k-c0x00ffffff-no-rj", "")
     except Exception as error:  # pylint: disable=broad-except
         _LOGGER.debug('%s - Could not update - %s', name, error)
-    return live
+    return live, channel_image

@@ -4,6 +4,17 @@ _A platform which give you info about the newest video on a channel._
 
 ![example](https://github.com/custom-components/sensor.youtube/raw/master/example.png)
 
+## __BREAKING CHANGE__
+
+Video views and stars are now reported.  As a result any automations triggered by state will now be triggered when the number of views or stars changes.  To avoid this, add the url attribute to the trigger so that the automation is only triggered when the reported url changes ie:
+
+``` yaml
+trigger:
+  - platform: state
+    entity_id: sensor.franck_nijhof
+    attribute: url
+```
+
 ## Example configuration.yaml
 
 ```yaml
@@ -29,6 +40,9 @@ key | type | description
 
 * url: URL of the most recent video
 * published: The time and date the video was published
+* stars: The 'stars' recieved on youtube. (This is all reactions both 👍 and 👎 combined)
+* views: the number of video views
 * stream: If the video was streamed live
 * live: If the video is live now
 * channel_is_live: If any video on the channel is live
+* channel_image: URL of the channel logo image

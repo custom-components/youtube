@@ -54,6 +54,8 @@ class YoutubeSensor(Entity):
         self._state = None
         self.session = session
         self._image = None
+        self.stars = 0
+        self.views = 0
         self.stream = False
         self.live = False
         self._name = name
@@ -84,6 +86,8 @@ class YoutubeSensor(Entity):
                 '<media:thumbnail url="')[1].split('"')[0]
             self._state = title
             self._image = thumbnail_url
+            self.stars = info.split('<media:starRating count="')[1].split('"')[0]
+            self.views = info.split('<media:statistics views="')[1].split('"')[0]
             url = CHANNEL_LIVE_URL.format(self.channel_id)
             self.channel_live, self.channel_image = await is_channel_live(url, self.name, self.hass, self.session)
         except Exception as error:  # pylint: disable=broad-except
@@ -114,6 +118,8 @@ class YoutubeSensor(Entity):
         """Attributes."""
         return {'url': self.url,
                 'published': self.published,
+                'stars': self.stars,
+                'views': self.views,
                 'stream': self.stream,
                 'live': self.live,
                 'channel_is_live': self.channel_live,
@@ -151,3 +157,4 @@ async def is_channel_live(url, name, hass, session):
     except Exception as error:  # pylint: disable=broad-except
         _LOGGER.debug('%s - Could not update - %s', name, error)
     return live, channel_image
+    

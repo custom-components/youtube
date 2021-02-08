@@ -1,0 +1,6 @@
+{
+  "name": "youtube",
+  "zip_release": true,
+  "filename": "youtube.zip",
+  "iot_class": "Cloud Poll"
+}

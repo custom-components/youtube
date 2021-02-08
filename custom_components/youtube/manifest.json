@@ -4,6 +4,6 @@
   "version": "0.0.0",
   "documentation": "https://github.com/custom-components/youtube",
   "dependencies": [],
-  "codeowners": ["@ludeeus"],
+  "codeowners": ["@ludeeus", "@pinkywafer"],
   "requirements": []
 }

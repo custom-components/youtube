@@ -12,18 +12,11 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-
-      - name: Get version
-        id: version
-        uses: home-assistant/actions/helpers/version@master
-
       - name: "Set version number"
         run: |
-          sed -i 's|"version": "0.0.0"|"version": "${{ steps.version.outputs.version }}"|' custom_components/youtube/manifest.json
+          sed -i 's|"version": "0.0.0"|"version": "${{ github.ref }}"|' custom_components/youtube/manifest.json
+          sed -i 's|refs/heads/||' custom_components/youtube/manifest.json
+          sed -i 's|refs/tags/||' custom_components/youtube/manifest.json
 
       - name: ZIP youtube folder
         run: |

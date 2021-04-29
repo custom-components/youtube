@@ -137,7 +137,7 @@ async def is_live(url, name, hass, session):
     stream = False
     try:
         async with async_timeout.timeout(10, loop=hass.loop):
-            response = await session.get(url)
+            response = await session.get(url, cookies=dict(CONSENT="YES+cb.0-0-p0.en+F+000", ANID="OPT_OUT"))
             info = await response.text()
         if 'isLiveBroadcast' in info:
             stream = True

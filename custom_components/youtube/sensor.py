@@ -153,7 +153,8 @@ async def is_channel_live(url, name, hass, session):
     live = False
     try:
         async with async_timeout.timeout(10, loop=hass.loop):
-            response = await session.get(url)
+            cookies_dict = {"CONSENT": "YES+srp.gws-"+date.today().strftime("%Y%m%d")+"-0-RC1.en+FX+130"}
+            response = await session.get(url, cookies=cookies_dict)
             info = await response.text()
         if '{"iconType":"LIVE"}' in info:
             live = True

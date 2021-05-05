@@ -43,6 +43,7 @@ key | type | description
 * stars: The 'stars' recieved on youtube. (This is all reactions both 👍 and 👎 combined)
 * views: the number of video views
 * stream: If the video was streamed live
+* stream_start: datetime of the start of a live stream
 * live: If the video is live now
 * channel_is_live: If any video on the channel is live
 * channel_image: URL of the channel logo image

@@ -5,5 +5,6 @@
   "documentation": "https://github.com/custom-components/youtube",
   "dependencies": [],
   "codeowners": ["@ludeeus", "@pinkywafer"],
-  "requirements": []
+  "requirements": [],
+  "iot_class": "cloud_polling"
 }

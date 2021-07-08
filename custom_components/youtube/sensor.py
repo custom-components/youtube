@@ -40,8 +40,8 @@ async def async_setup_platform(
             response = await session.get(url)
             info = await response.text()
         name = info.split('<title>')[1].split('</')[0]
-    except Exception:  # pylint: disable=broad-except
-
+    except Exception as error:  # pylint: disable=broad-except
+        _LOGGER.debug('Unable to set up - %s', error)
         name = None
 
     if name is not None:

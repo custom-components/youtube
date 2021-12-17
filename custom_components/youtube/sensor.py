@@ -60,6 +60,7 @@ class YoutubeSensor(Entity):
         self._name = name
         self.channel_id = channel_id
         self.url = None
+        self.content_id = None
         self.published = None
         self.channel_live = False
         self.channel_image = None
@@ -85,6 +86,7 @@ class YoutubeSensor(Entity):
             else:
                 _LOGGER.debug('%s - Skipping live check', self._name)
             self.url = url
+            self.content_id = url.split('?v=')[1]
             self.published = info.split('<published>')[2].split('</')[0]
             thumbnail_url = info.split(
                 '<media:thumbnail url="')[1].split('"')[0]
@@ -121,6 +123,7 @@ class YoutubeSensor(Entity):
     def extra_state_attributes(self):
         """Attributes."""
         return {'url': self.url,
+                'content_id': self.content_id,
                 'published': self.published,
                 'stars': self.stars,
                 'views': self.views,

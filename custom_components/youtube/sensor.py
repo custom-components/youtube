@@ -36,7 +36,7 @@ async def async_setup_platform(
     session = async_create_clientsession(hass)
     try:
         url = BASE_URL.format(channel_id)
-        async with async_timeout.timeout(10, loop=hass.loop):
+        async with async_timeout.timeout(10):
             response = await session.get(url)
             info = await response.text()
         name = info.split('<title>')[1].split('</')[0]
@@ -71,7 +71,7 @@ class YoutubeSensor(Entity):
         _LOGGER.debug('%s - Running update', self._name)
         try:
             url = BASE_URL.format(self.channel_id)
-            async with async_timeout.timeout(10, loop=self.hass.loop):
+            async with async_timeout.timeout(10):
                 response = await self.session.get(url)
                 info = await response.text()
             exp = parse(response.headers['Expires'])
@@ -136,7 +136,7 @@ async def is_live(url, name, hass, session):
     stream = False
     start = None
     try:
-        async with async_timeout.timeout(10, loop=hass.loop):
+        async with async_timeout.timeout(10):
             response = await session.get(url, cookies=dict(CONSENT="YES+cb"))
             info = await response.text()
         if 'isLiveBroadcast' in info:
@@ -153,7 +153,7 @@ async def is_channel_live(url, name, hass, session):
     """Return bool if channel is live"""
     live = False
     try:
-        async with async_timeout.timeout(10, loop=hass.loop):
+        async with async_timeout.timeout(10):
             response = await session.get(url, cookies=dict(CONSENT="YES+cb"))
             info = await response.text()
         if '{"iconType":"LIVE"}' in info:

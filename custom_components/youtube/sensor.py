@@ -115,6 +115,11 @@ class YoutubeSensor(Entity):
         return self._state
 
     @property
+    def unique_id(self):
+        """Return unique ID for this sensor."""
+        return self.channel_id
+
+    @property
     def icon(self):
         """Icon."""
         return ICON
@@ -123,6 +128,7 @@ class YoutubeSensor(Entity):
     def extra_state_attributes(self):
         """Attributes."""
         return {'url': self.url,
+                'friendly_name': self._name,
                 'content_id': self.content_id,
                 'published': self.published,
                 'stars': self.stars,

@@ -1,3 +1,4 @@
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 # youtube
 
 _A platform which give you info about the newest video on a channel._
@@ -18,7 +19,9 @@ trigger:
 ```
 
 ## Installation
-
+### HACS
+This repository supports installing through [HACS](https://hacs.xyz/).
+### Manual
 To get started put all the files from`/custom_components/youtube/` here:
 `<config directory>/custom_components/youtube/`
 

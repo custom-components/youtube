@@ -5,6 +5,6 @@
   "documentation": "https://github.com/custom-components/youtube",
   "dependencies": [],
   "codeowners": ["@pinkywafer"],
-  "requirements": [],
+  "requirements": ["beautifulsoup4"],
   "iot_class": "cloud_polling"
 }

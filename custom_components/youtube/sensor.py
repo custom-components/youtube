@@ -6,7 +6,6 @@ https://github.com/custom-components/youtube
 """
 
 import logging
-import async_timeout
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
@@ -40,10 +39,9 @@ async def async_setup_platform(
         channel_id = await get_channel_id(session, channel_id)
     try:
         url = RSS_URL.format(channel_id)
-        async with async_timeout.timeout(10):
-            response = await session.get(url)
-            info = await response.text()
-            name = info.split('<title>')[1].split('</')[0]
+        response = await session.get(url)
+        info = await response.text()
+        name = info.split('<title>')[1].split('</')[0]
     except Exception as error:  # pylint: disable=broad-except
         _LOGGER.error(f'Unable to set up {channel_id} - {error}')
         name = None
@@ -58,9 +56,8 @@ async def get_channel_id(session, user_name):
     url = CHANNEL_URL.format(user_name)
     _LOGGER.debug("Trying %s", url)
     try:
-        async with async_timeout.timeout(10):
-            response = await session.get(url, cookies=COOKIES)
-            html = await response.text()
+        response = await session.get(url, cookies=COOKIES)
+        html = await response.text()
         regex = r"<link rel=\"alternate\" type=\"application/rss\+xml\" title=\"RSS\" href=\"(.*?)\">"
         found = re.findall(regex, html, re.MULTILINE)
         if found:
@@ -99,9 +96,8 @@ class YoutubeSensor(Entity):
         _LOGGER.debug(f'{self._name} - Running update')
         try:
             url = RSS_URL.format(self.channel_id)
-            async with async_timeout.timeout(10):
-                response = await self.session.get(url)
-                info = await response.text()
+            response = await self.session.get(url)
+            info = await response.text()
             exp = parse(response.headers['Expires'])
             if exp < self.expiry:
                 return
@@ -171,9 +167,8 @@ class YoutubeSensor(Entity):
         stream = False
         start = None
         try:
-            async with async_timeout.timeout(10):
-                response = await self.session.get(url)
-                html = await response.text()
+            response = await self.session.get(url)
+            html = await response.text()
             if 'isLiveBroadcast' in html:
                 stream = True
                 start = parse(html.split('startDate" content="')[1].split('"')[0])
@@ -191,9 +186,8 @@ class YoutubeSensor(Entity):
         url = CHANNEL_LIVE_URL.format(self.channel_id)
         try:
             _LOGGER.debug("GET %s: %s", self._name, url)
-            async with async_timeout.timeout(10):
-                response = await self.session.get(url, cookies=COOKIES)
-                html = await response.text()
+            response = await self.session.get(url, cookies=COOKIES)
+            html = await response.text()
             if '{"iconType":"LIVE"}' in html:
                 live = True
                 _LOGGER.debug(f'{self._name} - Channel is live')

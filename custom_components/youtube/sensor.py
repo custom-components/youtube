@@ -18,7 +18,8 @@ import html
 
 CONF_CHANNEL_ID = 'channel_id'
 ICON = 'mdi:youtube'
-BASE_URL = 'https://www.youtube.com/feeds/videos.xml?channel_id={}'
+CHANNEL_URL = "https://www.youtube.com/{}"
+RSS_URL = 'https://www.youtube.com/feeds/videos.xml?channel_id={}'
 CHANNEL_LIVE_URL = 'https://www.youtube.com/channel/{}'
 COOKIES = {"SOCS": "CAESEwgDEgk0ODE3Nzk3MjQaAmVuIAEaBgiA_LyaBg"}
 
@@ -35,8 +36,10 @@ async def async_setup_platform(
     channel_id = config['channel_id']
     _LOGGER.debug(f'Setting up {channel_id}')
     session = async_create_clientsession(hass)
+    if channel_id.startswith('@'):
+        channel_id = await get_channel_id(session, channel_id)
     try:
-        url = BASE_URL.format(channel_id)
+        url = RSS_URL.format(channel_id)
         async with async_timeout.timeout(10):
             response = await session.get(url)
             info = await response.text()
@@ -50,8 +53,29 @@ async def async_setup_platform(
         async_add_entities([sensor], True)
 
 
+async def get_channel_id(session, user_name):
+    channel_id = None
+    url = CHANNEL_URL.format(user_name)
+    _LOGGER.debug("Trying %s", url)
+    try:
+        async with async_timeout.timeout(10):
+            response = await session.get(url, cookies=COOKIES)
+            html = await response.text()
+        regex = r"<link rel=\"alternate\" type=\"application/rss\+xml\" title=\"RSS\" href=\"(.*?)\">"
+        found = re.findall(regex, html, re.MULTILINE)
+        if found:
+            strings = found[0].split("=")
+            channel_id = strings[1]
+    except Exception as error:  # pylint: disable=broad-except
+        _LOGGER.debug(f'{user_name} - get_channel_id(): Error {error}')
+
+    _LOGGER.debug("Channel id for name %s: %s", user_name, channel_id)
+    return channel_id
+
+
 class YoutubeSensor(Entity):
     """YouTube Sensor class"""
+
     def __init__(self, channel_id, name, session):
         self._state = None
         self.session = session
@@ -74,7 +98,7 @@ class YoutubeSensor(Entity):
         """Update sensor."""
         _LOGGER.debug(f'{self._name} - Running update')
         try:
-            url = BASE_URL.format(self.channel_id)
+            url = RSS_URL.format(self.channel_id)
             async with async_timeout.timeout(10):
                 response = await self.session.get(url)
                 info = await response.text()
@@ -168,7 +192,7 @@ class YoutubeSensor(Entity):
         try:
             _LOGGER.debug("GET %s: %s", self._name, url)
             async with async_timeout.timeout(10):
-                response = await self.session.get(url, cookies = COOKIES)
+                response = await self.session.get(url, cookies=COOKIES)
                 html = await response.text()
             if '{"iconType":"LIVE"}' in html:
                 live = True

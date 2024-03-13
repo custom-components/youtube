@@ -27,10 +27,20 @@ To get started put all the files from`/custom_components/youtube/` here:
 
 ## Example configuration.yaml
 
+Using the old style channel id.
+
 ```yaml
 sensor:
   platform: youtube
   channel_id: UCZ2Ku6wrhdYDHCaBzLaA3bw
+```
+
+Or using new style channel name (_Note: You need to enclose the channel name in quotes!_)
+
+```yaml
+sensor:
+  platform: youtube
+  channel_id: '@frenck'
 ```
 
 ## Configuration variables
